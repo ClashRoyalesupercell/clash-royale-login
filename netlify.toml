@@ -1,0 +1,11 @@
+[build]
+  publish = "."
+  command = "echo 'ready'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.processing.html]
+  runtime = "php7.4"
